@@ -1,0 +1,176 @@
+---
+title: "Homework 1"
+author: "Jolie Tran"
+date: "`r Sys.Date()`"
+output: openintro::lab_report
+---
+
+```{r load-packages, message=FALSE}
+library(tidyverse)
+library(openintro)
+```
+
+### Problem 1
+#### Part a)
+The variables collected on each launch include: the type of launching agency (Private, State, or Startup), and the outcome of the launch (Success or Failure).
+
+#### Part b)
+The type of launching agency (Private, State, or Startup) is the categorical variable and it is nominal.
+The outcome of the launch (Success or Failure) is the categorical variable and it is nominal.
+
+#### Part c)
+The type of launching agency (Private, State, or Startup) is the response variable.
+The outcome of the launch (Success or Failure) is the explanatory variable.
+
+
+### Problem 2
+#### Part a)
+This is the observational study, or specifically, it is the cross sectional study.
+This is the observational study because the participants are not asked to do anything differently other than being questioned about the diary of screentime and how they felt or acted.
+This is the cross sectional study because the data are collected all at once, including the child’s screentime, feeling and behavior, sex and age, and the mother’s education, ethnicity, psychological distress, and employment.
+
+#### Part b)
+Explanatory variables are the child's screentime, sex, age, and the mother’s education, ethnicity, psychological distress, and employment.
+
+#### Part c)
+Response variable is how the child felt or acted.
+
+#### Part d)
+It is a yes and a no.
+It is yes because the results can be generalized only to the population of interest - teenagers from 12 to 15 years old across Ireland, the United States, and United Kingdom. This is because the study is well-designed. It considers as many lurking variables as possible.
+It is a no for the generalization to the worldwide population with no limit to the age range because the difference in demographic and leads to the difference of purpose of device usage.
+
+#### Part e)
+The results of the study cannot be used to establish causal relationships. Because this is the observational study, we can only generally conclude the associations.
+
+
+### Problem 3
+#### Part a)
+Simple random sample
+Pros: This method has strong external validity because it is completely random over the whole population.
+Cons: This method requires a lot of time because it takes very long to take random sample from a large population.
+
+#### Part b)
+Stratified random sample
+Pros: This method guarantees that all neighborhoods will considered be in the data sample.
+Cons: This method requires a lot of time because it takes very long to divide into different neighborhoods and take random sample from a each neighborhood.
+
+#### Part c)
+Cluster sampling
+Pros: This is the divide and conquer method that allows for a smaller pool of sample.
+Cons: Because not all types of neighborhoods show up in the sample (only 3), the results cannot represent the population of interest.
+
+#### Part d)
+Multistage sampling
+Pros: This is the divide and conquer method that allows for a smaller pool of sample.
+Cons: Because not all types of neighborhoods show up in the sample (only 8), the results cannot represent the population of interest.
+
+#### Part e)
+Convenience sampling
+Pros: This method allows for the data to be easily and conveniently collected from the samples.
+Cons: Not all types of the neighborhoods are included because only the households closest to the council office are considered.
+
+
+### Problem 4
+#### Part a)
+Population of interest: children between the ages of 5 and 15.
+Sample in this study: 160 children between the ages of 5 and 15.
+
+#### Part b)
+Yes, the results of the study can be generalized to the population if the study used the completely randomized design and the sampling method used was the simple random sample considering the whole population of interest.
+Yes, the findings of the study can be used to establish causal relationships because this study was an experiment.
+
+
+### Problem 5
+#### Part a)
+Percentage of all videos on YouTube that are cat videos is a population parameter.
+
+#### Part b)
+2% is a sample statistic.
+
+#### Part c)
+A video in your sample an observation.
+
+#### Part d)
+Whether a video is a cat video is a variable.
+
+
+### Problem 6
+#### Part a)
+Circumference of a circle is: $C = 2 \pi r$
+Area of a circle is:  $A = \pi r^2$
+
+#### Part b)
+``` {r Circumference and Area of a circle}
+rad <- c(0.25, 1.5)
+(C <- 2 * pi * rad)
+(A <- pi * (rad^2))
+```
+  
+#### Part c)
+The circle with radii of 0.25 inches has a circumference of 1.57 inches, and an area of 0.20 inches squared.
+The circle with radii of 1.5 inches has a circumference of 9.42 inches, and an area of 7.07 inches squared.
+
+
+### Problem 7
+``` {r Read in Patient Data}
+# We are providing the code for reading in the data and converting
+# Sex and MaritalStat to type factor
+PDat <- read_csv("Patient_Data.csv")
+# Create a factor variable for Sex; the levels will be in 
+# alphabetical order
+PDat$Sex <- factor(PDat$Sex)
+# Create a factor variable with a specified order to the levels
+# of MaritalStat. Marital status is not an ordinal variable, 
+# but you can still set the order of the levels to control 
+# the order they are printed in output
+PDat$MaritalStat <- factor(PDat$MaritalStat,
+                           level=c("S","M","D","W"))
+```
+
+#### Part a)
+``` {r Observations in MaritalStat category}
+(count.MS <- PDat %>% count(MaritalStat))
+(pct.M <- count.MS[2,2] / sum(count.MS[,2]) * 100)
+```
+The percentage of patients are married is 32.38%
+
+
+#### Part b)
+``` {r Observations of Widowed patients}
+PDat.W <- PDat %>% filter(MaritalStat == "W")
+glimpse(PDat.W)
+```
+There are a total of 16 patients who are widowed in the data.
+
+
+#### Part c)
+``` {r Observations of FEMALE Widowed patients}
+count.WF <- PDat.W %>% count(Sex == "F")
+(pct.WF <- count.WF[2,2] / sum(count.WF[,2]) * 100)
+```
+There is 62.5% of the widowed participants who are female.
+
+
+
+### Problem 8
+#### Part a)
+This is an observational study because first, the study is not designed to conclude a causal relationship, and second, it is carried out through a survey and participants are not asked to do anything differently other than to express their opinions.
+
+#### Part b)
+Population of interest anyone who is connected to schizophrenia, including those with lived experience of mental illness, family members, clinicians, researchers, government officials, and the general public.
+
+#### Part c)
+The study recruited across a broad, diverse array of community stakeholders, including those with lived experience of mental illness, family members, clinicians, researchers, government officials, and the general public.
+There were 1190 participants (sample size n = 1190) in this study.
+
+#### Part d)
+The number 74% means that there are 74% of respondents thought that the term ‘schizophrenia’ should be renamed AFTER the alternative names were given.
+
+#### Part e)
+Limitations of the study cited by the authors of the journal article:
+First, "while [our] sample included a diverse range of ethnic and racial backgrounds, the proportions of minority populations were relatively small (6.5% Hispanic or Latin, 16.2% from a racially diverse background)" and "there was a preponderance of female respondents (67% of sample)".
+Second, since the survey provided respondents with the option to mark their identification with more than one stakeholder group, it limited the researchers' ability to assign the 34% of respondents choosing more than one option to a single stakeholder group. 
+
+#### Part f)
+It is important to include a limitations section when writing a journal article because any further studies that refer to the previously conducted study would be aware of the limitations and develop a more well-designed, optimized, and accurate study.
