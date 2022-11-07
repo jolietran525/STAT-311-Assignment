@@ -1,0 +1,149 @@
+---
+title: "Lesson 4"
+author: "Tamre Cardoso"
+date: "`r Sys.Date()`"
+output: openintro::lab_report
+---
+
+```{r load-packages, message=FALSE}
+library(tidyverse)
+library(openintro)
+library (ggpubr) #for ggarrange function
+```
+
+### Simulate Coin Tosses
+
+Note the use of set.seed in this example. Using set.seed keeps the same
+sets of simulations each time you run the code. Great for testing. If you 
+want new random draws, remove or comment out the set.seed call.
+
+Also note the use of a for loop to draw one set of simulations for each sample size. This is one; I wanted to show a loop. We could have made all 1000 random draws at a time and written code to plot along make calculations and plot along windows from 1:1000.
+
+```{r coin toss using a for loop}
+set.seed(123) # chooses a pseudorandom starting place so results are reproducible
+totnum.heads <- vector(length=1000)
+num.heads <- vector(length=1000)
+prop.heads <- vector(length=1000)
+for (itoss in 1:1000) {
+  toss <- rbinom(itoss,1,0.5)
+  totnum.heads[itoss] <- sum(toss)
+  num.heads[itoss] <- sum(toss) - (itoss/2)
+  prop.heads[itoss] <- sum(toss)/itoss
+}
+```
+
+### Plot Coin Toss Simulations
+```{r plot simulations}
+par(mfrow=c(2,2))
+plot(1:1000,num.heads,xlab="Number of Tosses",
+     ylab="# H - .5(# Tosses)", ylim=c(-40,40),
+     cex.axis=1.5,cex.lab=1.5,cex=1.5,type="l", main="Full Sequence")
+abline(h=0,col="blue",lwd=2)
+plot(1:100,num.heads[1:100],xlab="Number of Tosses",
+     ylab="# H - .5(# Tosses)", ylim=c(-40,40),
+     cex.axis=1.5,cex.lab=1.5,cex=1.5,type="l", 
+     main="First 100")
+abline(h=0,col="blue",lwd=2)
+plot(901:1000,num.heads[901:1000],xlab="Number of Tosses",
+     ylab="# H - .5(# Tosses)", ylim=c(-40,40),
+     cex.axis=1.5,cex.lab=1.5,cex=1.5,type="l",
+     main="Last 100")
+abline(h=0,col="blue",lwd=2)
+
+par(mfrow=c(2,2))
+plot(1:1000,prop.heads,xlab="Number of Tosses",
+     ylab="Proportion Heads", ylim=c(0,1),
+     cex.axis=1.5,cex.lab=1.5,cex=1.5,type="l", main="Full Sequence")
+abline(h=0.5,col="blue",lwd=2)
+plot(1:100,prop.heads[1:100],xlab="Number of Tosses",
+     ylab="Proportion Heads", ylim=c(0,1),
+     cex.axis=1.5,cex.lab=1.5,cex=1.5,type="l", main="First 100")
+abline(h=0.5,col="blue",lwd=2)
+plot(901:1000,prop.heads[901:1000],xlab="Number of Tosses",
+     ylab="Proportion Heads", ylim=c(0,1),
+     cex.axis=1.5,cex.lab=1.5,cex=1.5,type="l", main="Last 100")
+abline(h=0.5,col="blue",lwd=2)
+```
+
+### Discrete Probability Distributions in R
+
+##### Bernoulli and Binomial Distributions
+Bernoulli and Binomial use the same functions--recall that a Bernoulli RV is just a binomial RV with n = 1
+
+pbinom() gives probability (X <= x) for a binomial random variable with parameters p and n. NOTE the use of <= instead of <; since this is a discrete distribution <= is not the same as <.
+
+qbinom() gives you the value of x for P(X <= x) = some p
+rbinom() gives independent random draws from a binomial distribution
+
+```{r}
+#Generate one flip of a fair coin; let 0 = Heads and 1 = Tails
+rbinom(n = 1, size = 1, p = 0.5) 
+# Here n = total number of observations to generate and
+# size = number of trials and 0.5 is p
+
+# Genearte 50 flips of a fair coin
+rbinom(50, 1, 0.5)
+
+#Find P(X <= 7) for X ~ Binomial(n=12, p = 0.3)
+pbinom(7, 12, 0.3)
+1 - pbinom(0, 12, 0.075)
+1 - dbinom(0, 12, 3/40)
+
+# Find the value of x when P(X <= x) = 0.50 for 
+# X ~ Binomial(n=12, p = 0.3)
+qbinom(0.50, 12, 0.3) # P(X <= 4) ~ 50%
+```
+
+#### Poisson Distribution
+
+ppois() gives probability (X <= x) for a Poisson distributed RV with lambda; in class we used mu = lambda x t; for these functions you just need to enter either labmda if t = 1 or you need to enter lambda*t if you are scaling the unit rate up or down.
+
+NOTE the use of <= instead of <; since this is a discrete distribution <= is not the same as <
+
+qpois() gives you the value of x for P(X <= x) = some p
+
+rpois() gives independent random draws from a Poisson distribution
+
+```{r}
+# Genearte 100 independent draws from a Poisson 
+# distribution with lambda = 4
+rpois(100,4)
+hist(rpois(100,4), main="X ~ Poisson(4)")
+# Calculate P(X <= 6)
+ppois(6, 4)
+dpois(0, 1.5) + dpois(1, 1.5) + dpois(2, 1.5) + dpois(3, 1.5)
+# Calculate P(X = 6)
+ppois(6, 4) - ppois(5, 4)
+
+# What is the value of x such that P(X <= x) = 0.10
+qpois(0.10, 4)
+```
+
+#### Geometric and Hypergeometric RV's in R
+
+I generally just write my own code for these when needed but if you are interested, you can look up the function rhyper and rgeom and read about the set of functions for these two types of random variables.
+
+### Combinations and Factorials in R
+
+The two main functions are choose for combinations and factorial for finding factorials.
+
+```{r}
+# Use choose(n, r) to find the number of combinations 
+# of r things from n things
+# 95 choose 5
+choose(95,5)
+
+# To find permutations remember that 
+# n C r = n P r/r! ==> n P r = n C r * r!
+# Find the number of permutations of 5 things from 
+# 95 things
+choose(95,5) * factorial(5)
+
+dgeom(0, 0.35) + dgeom(1, 0.35) + dgeom(2, 0.35) 
+pgeom(2, 0.35)
+# Find 10! 
+factorial(10)
+
+x0 <- choose(12, 0) * (0.075)^(0) * (0.925)^(12)
+1 - (x0)
+```
