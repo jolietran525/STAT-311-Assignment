@@ -1,0 +1,267 @@
+---
+title: "Homework 5"
+author: "Jolie Tran"
+date: "`r Sys.Date()`"
+output: openintro::lab_report
+---
+
+```{r load-packages, message=FALSE}
+library(tidyverse)
+library(openintro)
+library(infer)
+```
+
+### Problem 1
+Define T = total weight of five randomly selected 1lb. bags of potatoes.
+
+T = X1 + X2 + X3 + X4 + X5, where each Xi has the same normal distribution, $X_i\sim N(1.09, 0.10)$ and the Xi's are independent.
+
+$T\sim N(\mu_T = 1.09 * 5 = 5.45, \mu_T = \sqrt{(0.10^2)*5}=0.2236)$
+
+Since we want to check the probability that the sum of the weights of the five 1 lb. bags exceeds the weight of one 5 lb. bag, we want to find the distribution of T - Y.
+
+Since $T\sim N(5.45,0.2236)$ and $Y\sim N(5.12,0.18)$ both have the normal distribution, $(T-Y)\sim N(5.45-5.12 = 0.33,\sqrt{0.2236^2+0.18^2}=0.29)$
+
+The probability that the sum of the weights of the five 1 lb. bags exceeds the weight of one 5 lb. bag is P(T-Y > 0) = 0.87
+
+```{r calculation for P(T-Y > 0)}
+1 - pnorm(0, 0.33, 0.29)
+```
+
+### Problem 2
+#### Read in Data
+```{r read in ZOD data}
+ZOD <- read_csv("ZODTwoGroups.csv")
+ZOD$Pie <- factor(ZOD$Pie)
+```
+
+#### Part a)
+```{r comparative boxplot}
+p <- ggplot(ZOD, aes(x = Pie, y = ZOD)) +
+  geom_boxplot() + xlab("Pie Type") +
+  ylab("ZOD (minutes)")
+p
+```
+
+Regarding the distribution of each boxplot, both distributions are slightly left skewed and have no apparent outliers.
+
+The boxplot of the Cherry group shows a significantly higher median for ZOD than Apple group's.
+
+The Cherry group also have a greater variability in ZOD compared to Apple group.
+
+Overall, it shows that the Cherry group have a significantly higher ZOD than Apple group.
+
+
+#### Part b)
+```{r create permutations}
+set.seed(25)
+PermsOut <- ZOD %>%
+  rep_sample_n(size = nrow(ZOD), reps = 1000, replace = FALSE) %>%
+  mutate(ZOD_perm = sample(ZOD)) %>%
+  group_by(replicate, Pie) %>%
+  summarize(prop_ZOD_perm = mean(ZOD_perm), prop_ZOD = mean(ZOD)) %>%
+  summarize(diff_perm = diff(prop_ZOD_perm), diff_orig = diff(prop_ZOD))
+PermsOut
+```
+
+The observed difference in means for the sample data is 3.67.
+
+
+#### Part c)
+The statistical hypotheses are
+H0: $\mu_{Cherry} - \mu_{Apple} = 0$
+HA: $\mu_{Cherry} - \mu_{Apple} > 0$
+
+
+#### Part d)
+```{r Histogram of Null Distribution}
+origdiff <- PermsOut$diff_orig[1]
+p1 <- ggplot(data = PermsOut, aes(x = diff_perm)) +
+  geom_histogram(bins = 13) +
+  xlab("Cherry - Apple") +
+  geom_vline(xintercept = origdiff, col="Red")
+p1
+```
+
+The shape of the null distribution is fairly normally distributed.
+
+The observed sample difference is at the very right tail of overall distribution.
+
+
+#### Part e)
+```{r p-value}
+PermsOut %>% 
+  summarize(count = sum(diff_orig <= diff_perm),
+            proportion = mean(diff_orig <= diff_perm))
+```
+
+The p-value is 0.002.
+
+The p-value (0.002) is the probability of observing a difference of 3.67 or more assuming the proportion of ZOD time does not across the group of student having cherry and student having apple 2 hours before class.
+
+
+#### Part f)
+Since p-value (0.002) is smaller than 0.05, we can reject the null hypothesis in favor of the alternative hypothesis.
+
+
+### Problem 3
+#### Part a)
+```{r read in wt loss data}
+WL <- read_csv("PopularDietsCombined.csv")
+WL$Diet <- factor(WL$Diet)
+boxplot(WL$WtLossKG ~ WL$Diet, data = WL)
+```
+
+#### Part b)
+```{r find mean wt loss}
+summary(WL)
+```
+
+The point estimate for mean weight loss across all diets is $\bar{x}=4.95$
+
+
+#### Part c)
+```{r bootstrap samples}
+# code for bootstrap samples given; need to add code for histogram
+set.seed(25)
+# 1000 bootstrap samples so we can display the distribution
+BootSamp1000 <- WL %>%  specify(response = WtLossKG) %>% 
+  generate(reps = 1000, type = "bootstrap") %>% 
+  calculate(stat = "mean")
+
+# Set the constants for the true mean, and the
+# lower and upper confidence bounds for adding 
+# vertical lines to the graph
+TrueMean <- 4.95
+LC95 <- sort(BootSamp1000$stat)[25]
+UC95 <- sort(BootSamp1000$stat)[975]
+# Make a histogram of the bootstrap distribution
+B1 <- ggplot(data = BootSamp1000, aes(x = stat )) +
+  geom_histogram(bins = 10, colour = 1, fill = "white") +
+  xlab("x_hat") + geom_vline(xintercept = TrueMean, col="Red") +
+  geom_vline(xintercept = LC95, col="Blue") +
+  geom_vline(xintercept = UC95, col="Blue")
+B1
+```
+
+The bootstrapped distribution for mean weight loss is slightly right skewed with no apparent outlier.
+
+
+#### Part d)
+```{r get 95 percent CI}
+set.seed(25)
+BootSamp1000 %>% get_ci(level = 0.95)
+```
+
+get_ci(level = 0.95) returned a lower bound of 3.64 and an upper bound of 6.47. This means that about 95% of our bootstrapped x_hat's fell between 3.64 and 6.47.
+
+We are 95% confident that the participants who completed the study lose between 3.64 and 6.47 kg.
+
+
+#### Part e)
+```{r get 90 and 99 percent CI}
+#We want to you repeat set.seed for both sets of samples
+set.seed(25)
+BootSamp1000 %>% get_ci(level = 0.90)
+set.seed(25)
+BootSamp1000 %>% get_ci(level = 0.99)
+```
+
+get_ci(level = 0.90) returned a lower bound of 3.85 and an upper bound of 6.14. This means that about 95% of our bootstrapped x_hat's fell between 3.85 and 6.14.
+
+We are 90% confident that the participants who completed the study lose between 3.85 and 6.14 kg.
+
+get_ci(level = 0.99) returned a lower bound of 3.15 and an upper bound of 6.85. This means that about 99% of our bootstrapped x_hat's fell between 3.15 and 6.86.
+
+We are 99% confident that the participants who completed the study lose between 3.15 and 6.86 kg.
+
+
+#### Part f)
+
+If we did the entire bootstrap sampling again, the distribution of 1000 x_hat’s would produce a slightly different confidence interval.
+
+
+#### Part g)
+```{r bootstrap samples new}
+# no set.seed in this part
+WL %>%  specify(response = WtLossKG) %>% 
+  generate(reps = 1000, type = "bootstrap") %>% 
+  calculate(stat = "mean") %>%
+  get_ci(level = 0.95)
+
+WL %>%  specify(response = WtLossKG) %>% 
+  generate(reps = 1000, type = "bootstrap") %>% 
+  calculate(stat = "mean") %>%
+  get_ci(level = 0.95)
+```
+
+Yes, these interval do support what I wrote for part f.
+
+We recognize that point estimate can vary from sample to sample. Our confidence interval provides some bounds on the uncertainty due to random sample variation.
+
+If we look at the 95% confidence interval in part d, which is has a lower bound of 3.64 and an upper bound of 6.47, we could see a slight difference here when we draw two new sets of 1000 bootstrap samples using the 93 observations and report the 95% bootstrap confidence interval.
+
+
+#### Part h)
+
+They will be slightly different that that of 1000 samples.
+
+
+#### Part i)
+```{r smaller bootstrap samples}
+set.seed(25)
+# 500 bootstrap samples
+WL %>%  specify(response = WtLossKG) %>% 
+  generate(reps = 500, type = "bootstrap") %>% 
+  calculate(stat = "mean") %>%
+  get_ci(level = 0.95)
+  
+set.seed(25) 
+# 100 bootstrap samples
+WL %>%  specify(response = WtLossKG) %>% 
+  generate(reps = 100, type = "bootstrap") %>% 
+  calculate(stat = "mean") %>%
+  get_ci(level = 0.95)
+
+set.seed(25)  
+# 10 bootstrap samples
+WL %>%  specify(response = WtLossKG) %>% 
+  generate(reps = 10, type = "bootstrap") %>% 
+  calculate(stat = "mean") %>%
+  get_ci(level = 0.95)
+```
+
+Yes, these intervals do support what I wrote for part h.
+
+The difference on these intervals is due to random sample variation.
+
+
+#### Part j)
+```{r Ornish vs Weight Watchers}
+# Start by adding code to create the two subsets
+WW <- WL %>% filter(Diet == "WW")
+Ornish <- WL %>% filter(Diet == "Ornish")
+
+# Add code for first diet
+set.seed(25)
+WW %>%  specify(response = WtLossKG) %>% 
+  generate(reps = 1000, type = "bootstrap") %>% 
+  calculate(stat = "mean") %>%
+  get_ci(level = 0.95)
+
+# Add code for second diet
+set.seed(25)  
+Ornish %>%  specify(response = WtLossKG) %>% 
+  generate(reps = 1000, type = "bootstrap") %>% 
+  calculate(stat = "mean") %>%
+  get_ci(level = 0.95)
+```
+
+The two diets have a slightly similar lower bound, but Ornish diet have a much greater upper bound compared to that of WW.
+
+We are 95% confident that the participants who completed the WW diet lose between 2.7 and 6.63 kg, and those who completed the Ornish diet lose between 2.82 and 10.77 kg.
+
+We could say that the mean weight loss for the Ornish diet is higher than that of the WW diet.
+
+...
+
