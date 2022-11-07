@@ -1,0 +1,223 @@
+---
+title: "Homework 3"
+author: "Jolie Tran"
+date: "`r Sys.Date()`"
+output: openintro::lab_report
+---
+
+```{r load-packages, message=FALSE}
+library(tidyverse)
+library(openintro)
+library(alr4) #for HBSprices data
+library (ggpubr) #for ggarrange function
+```
+
+### Problem 1
+#### Part a
+The rice variables are measured in the minutes of labor required by the typical worker in that country to buy the product, so it adjusts for currency, wages and price levels.
+
+#### Part b
+```{r Create histograms and boxplots}
+data("UBSprices")
+
+#histogram of rice2003
+h_rice2003 <- ggplot(UBSprices, aes(x = rice2003)) +
+  geom_histogram(bins = 5) + 
+  labs(x = "Rice Price 2003 (minutes of labor)")
+
+#histogram of rice2009
+h_rice2009 <- ggplot(UBSprices, aes(x = rice2009)) +
+  geom_histogram(bins = 5) + 
+  labs(x = "Rice Price 2009 (minutes of labor)")
+
+#boxplot of rice2003
+bp_rice2003 <- ggplot(UBSprices, aes(x = rice2003)) +
+  geom_boxplot() +
+  labs(x = "Rice Price 2003 (minutes of labor)")
+
+#boxplot of rice2009
+bp_rice2009 <- ggplot(UBSprices, aes(x = rice2009)) +
+  geom_boxplot() +
+  labs(x = "Rice Price 2009 (minutes of labor)")
+
+# put 4 graphs in a single figure
+ggarrange(h_rice2003, bp_rice2003, h_rice2009, bp_rice2009, ncol = 2, nrow = 2) 
+
+```
+
+Price of rice in 2003 has a right-skewed distribution with 3 apparent outliers.
+
+Price of rice in 2009 has a right skewed distribution with 2 apparent outliers.
+
+Not including outliers, the data values of rice 2003 are distributed as less dispersed than those from rice 2009. Including the outliers, the data of rice 2003 have a larger range compared to rice 2009.
+
+
+
+#### Part c
+```{r Summary statistics}
+# Statistic Summaries rice 2003
+n_rice2003 <- UBSprices %>% count(rice2003)
+UBSprices %>% summarise(n = sum(n_rice2003[, 2]),
+                   Mean = round(mean(rice2003), 1),
+                   SD = round(sd(rice2003), 1),
+                   Min = min(rice2003),
+                   Q1 = quantile(rice2003, 0.25),
+                   Median = median(rice2003),
+                   Q3 = quantile(rice2003, 0.75),
+                   Max = max(rice2003))
+
+# Statistic Summaries rice 2009
+n_rice2009 <- UBSprices %>% count(rice2009)
+UBSprices %>% summarise(n = sum(n_rice2009[, 2]),
+                   Mean = round(mean(rice2009), 1),
+                   SD = round(sd(rice2009), 1),
+                   Min = min(rice2009),
+                   Q1 = quantile(rice2009, 0.25),
+                   Median = median(rice2009),
+                   Q3 = quantile(rice2009, 0.75),
+                   Max = max(rice2009)) 
+
+```
+
+The 7-number summary statistics for rice2003 and rice2009 are consistent with what we have in the graphs in part(b).
+
+We could expect the values from the graphs for the median, the largest and smallest values (including outliers) and the 7-summary statistics to be roughly the same, and thus the statistics are consistent with what we found in the graphs.
+
+There are no missing values for either variable because there are a total of 54 observations for each variable and we take all 54 observations into account.
+
+
+### Problem 2
+#### Part a
+```{r Scatterplot}
+ggplot(UBSprices, aes(x = rice2003, y = rice2009)) +
+  geom_point() +
+  geom_abline(slope = 1, intercept = 0, col="blue") +
+  labs(x = "Rice Price 2003 (minutes of labor)", y = "Rice Price 2009 (minutes of labor)")
+  
+```
+
+#### Part b
+The data of both variables are populated around smaller values and more scattered as the values get larger.
+
+Consider the examples:
+Below the line y = x: (26 in 2003 = 20 in 2009) or (98 in 2003 = 37 in 2009)
+Above the line y = x: (26 in 2003 = 38 in 2009) or (22 in 2003 = 65 in 2009)
+
+The main difference between points that fall above the y = x line and points that fall below this line: The points that fall above the line have the smaller values in 2003 than in 2009. And the points that fall below the line have the larger values in 2003 than in 2009.
+
+#### Part c
+```{r Find price difference}
+# some code to calculate the differences and order them
+# or you can look at the UBSprices data object
+(diff.price <- as.numeric(UBSprices$rice2009 - UBSprices$rice2003))
+(diff.out <- data.frame(cbind(City = row.names(UBSprices),
+                             Diff = diff.price)))
+(diff.out2 <- diff.out[order(as.numeric(diff.out$Diff)),])
+```
+
+Vilnius has the largest increase in rice price, with 51.5 minutes of labor increase from 2003 to 2009.
+
+Mumbai has the largest decrease in rice price, with 59 minutes of labor decrease from 2003 to 2009.
+
+
+### Problem 3
+```{r Linear regression}
+lm.out <- lm(UBSprices$rice2009 ~ UBSprices$rice2003)
+plot(UBSprices$rice2003, UBSprices$rice2009, pch = 19,
+     xlab = "Rice Price 2003 (minutes of labor)",
+     ylab = "Rice Price 2009 (minutes of labor)")
+abline(lm.out, col="blue")
+summary(lm.out)
+
+```
+
+Regression equation: $\hat y_{i} = 12.6 + 0.5\hat x_{i}$
+
+Interpretation: For 1 minute of labor increase in Rice Price in 2003, the Rice Price in 2009 roughly increase by 0.5 minute on average. 
+
+### Problem 4
+Coefficient of determination R-squared: 0.25
+
+Interpretation of coefficient of determination R-squared: About 25% of the variability in Rice Price in 2009 can be explained by the Rice Price in 2003.
+
+### Problem 5
+Residual standard error: 12.9
+
+Interpretation of residual standard error: 12.9 is the average distance of the observed values from the line fitted values. And this number is reasonably large as we see that this regression line is not best fitted to the data in the graph.
+
+### Problem 6
+```{r y given x equals 25}
+12.6 + 0.5 * 25
+
+```
+
+The expected value of the price of rice in 2009 when the price of rice in 2003 is 25 minutes of labor is 25.1 minutes of labor.
+
+
+### Problem 7
+```{r regression residual for Chicago}
+y_exp <- 12.6 + 0.5 * 7
+# the Rice Price in 2009 is 9 minutes of labor
+9 - y_exp
+```
+
+Given the Rice Price of Chicago in 2003 is 7 minutes of labor, the regression residual for Chicago based on the fitted regression line is -7.1 minutes of labor.
+
+
+### Problem 8
+The Rice Price data point for Mumbai in 2003 is 96 while the mean of Rice Price in 2003 is 19.5 while its standard deviation 14.6, which is oddly far from the mean and makes it a high leverage.
+
+
+### Problem 9
+```{r Check for influential point}
+newUBSprices <- UBSprices[-36, ]
+lm.out1 <- lm(newUBSprices$rice2009 ~ newUBSprices$rice2003)
+plot(newUBSprices$rice2003, newUBSprices$rice2009, pch = 19,
+     xlab = "Rice Price 2003 (minutes of labor)",
+     ylab = "Rice Price 2009 (minutes of labor)")
+abline(lm.out1, col="red")
+summary(lm.out1)
+```
+
+The original regression line equation is $\hat y_{i} = 12.6 + 0.5\hat x_{i}$ with R-squared = 0.25, while the new one is $\hat y_{i} = 6.9 + 0.8\hat x_{i}$ with R-squared = 0.34.
+
+The slope of the regression is significantly changed when we remove Mumbai. Therefore, the data point for Mumbai is influential.
+
+### Problem 10
+```{r Residual plot}
+# Residual plot for fitted regression using x values
+plot(UBSprices$rice2003, residuals(lm.out),
+     xlab="Rice Price 2003 (minutes of labor)", ylab="Residuals")
+abline(h=0, col="blue")
+```
+
+Although this residual plot does not have any apparent patterns, but the values are not distributed symmetrically: they clumped in one end and scattered on another end, not bouncing symmetrically around zero line. Therefore, this indicates that this plot violates the linearity assumption.
+
+
+### Problem 11
+```{r Check normality of residuals}
+hist(residuals(lm.out), xlab = "Residual", main = "")
+qqnorm(residuals(lm.out))
+qqline(residuals(lm.out))
+```
+
+Looking at the histogram, if we just consider the first 6 bins, we see that it is slightly a normal distribution. However, we see there are 2 last bins on its right end, and we consider it the outliers, making it a right-skewed distribution.
+
+Looking at the Q-Q Plot, we see a curved pattern with slope increasing from left to right and it indicates that data distribution is skewed to right.
+
+Therefore the residuals are not normally distributed.
+
+
+### Problem 12
+A linear model would not be a useful way to have rice2003 estimating the price of rice in 2009.
+
+First, the R-squared value of the original regression implies that we can only estimate about 25% of the rice price in 2009 with our known rice price in 2003.
+
+Second, the residual standard error is 12.9, which suggests that our observed values are pretty far away from out fitted values on the regression line.
+
+Third, looking at the residual plot, we see that the values are not normally distributed - they clump on one end and scatter on another end.
+
+And lastly, the histogram and normal probability plot of the residuals further confirm us that the residuals are right-skewed while it should be normally distributed insead.
+
+
+...
