@@ -1,0 +1,282 @@
+---
+title: "Homework 2"
+author: "Jolie Tran"
+date: "`r Sys.Date()`"
+output: openintro::lab_report
+---
+
+```{r load-packages, message=FALSE}
+library(tidyverse)
+library(openintro)
+```
+
+### Problem 1
+
+#### a)
+The number of observations for each sequence and B is n = 8.
+
+Mean : Mean of A is greater than mean of B.
+Explanation : Since the the two sequences A and B are only differed by one number, -20 (A) or -40 (B), we only care about the sum of each of the sequence of numbers A and B. Therefore, the total of A must be greater than the total of B, and thus mean of A must be greater than mean of B.
+
+SD : The SD of B is greater than the SD of A.
+Explanation : We care about how far the data is spread out from the mean, given that mean of A is greater than mean of B, and the two sequences are only by one number, -20 (A) or -40 (B). As the result, the spread from the data to the mean of B is greater than A's. Thus, the SD of B is greater than the SD of A.
+
+Mean is not sensitive to the spread of data distribution. Although A has a greater mean than B has, the data values of B are more spread out than the those of A.
+
+
+#### b)
+The number of observations for each sequence A and B is n = 5.
+
+Mean : Mean of A equals mean of B (= 300).
+Explanation : When calculating the mean, we care about the sum of value of the observations, and both A and B each add up to 1500. Therefore, mean of A is equal to mean of B.
+
+SD : The SD of B is greater than the SD of A.
+Explanation : We care about how far the data is spread out from the mean, given that mean of A is equal to mean of B. For the two sequences, the data distribution of B is much spread out from the mean than the data distribution of A. Thus, the SD of B is greater than the SD of A.
+
+Mean is not sensitive to the spread of data distribution. Although A and B have the same mean (= 300), the data values of B are much more spread out than the those of A.
+
+
+#### c)
+The number of observations for each sequence A and B is n = 5.
+
+Median : Median of A is 50, median of B is 500. 
+Explanation : Median is the middle value in the sorted sequence. In the case of A and B where n = 5, median is always the 3rd value. Therefore, median = 50 (A), median = 500 (B).
+
+IQR : IQR of A is 75, and IQR of B is 750.
+Explanation : The IQR is given mathematically as IQR = (3rd quartile) - (1st quartile). The 3rd quartile is 3(n+1)/4, and the 1st quartile is 1(n+1)/4. Given the number of observations is 5, the 3rd quartile is the 4.5th value, or the average of the 4th and 5th value, and the 1st quartile is the 1.5th value in the sequences, or the average of the 1st and 2nd value. Therefore, IQR of A is 75, and IQR of B is 750.
+
+B consists of values that are 10 times bigger than the values in the A. Thus, the median and IQR of B are 10 times greater than those of A.
+
+
+#### d)
+The number of observations for each sequence A and B is n = 5.
+
+Median : Median of A = 3, median of B = 8. 
+Explanation : Median is the middle value in the sorted sequence. In the case of A and B where n = 5, median is always the 3rd value. Therefore, median of A = 3, median of B = 8.
+
+IQR : IQR of A is 3, and IQR of B is 3.
+Explanation : The IQR is given mathematically as IQR = (3rd quartile) - (1st quartile). The 3rd quartile is 3(n+1)/4, and the 1st quartile is 1(n+1)/4. Given the number of observations is 5, the 3rd quartile is the 4.5th value, or the average of the 4th and 5th value, and the 1st quartile is the 1.5th value in the sequences, or the average of the 1st and 2nd value. Therefore, IQR of A is 3, and IQR of B is 3.
+
+The two distributions have a different median with distribution B having a bigger median (8 > 3), but they both have the same IQR (3).
+
+
+
+### Problem 2
+Average paid days off equals to the sum of each employee's paid time off divided by the number of employees.
+Thus, the average paid days off is directly proportional to the sum of of each employee's paid time off. Then as the sum of the paid days off raises, the average number of paid days off also raises.
+So the manager should fire 10 employees with the least days off. 
+
+
+
+### Problem 3
+
+#### a)
+The new student's score decreases the mean score. This is because the new student's score is below the average. To further explain it, if we want to keep the same mean score for the whole class, the new student must score 74. So any score below the mean will decrease and any score above the mean will increase the mean.
+
+
+#### b)
+The new mean is obtained by taking the the total score of 24 students  $74*24=1776$, plus the score of the new student $1776+64=1840$, divided by 25 $1840/25 = 73.6$. Or:
+$$\bar x_{new} = \frac {74 * 24 + 64}{25} = 73.6$$
+
+
+#### c)
+The standard deviation gives us a sense of how far data values are from the mean. This range is represented as [mean - standard deviation; mean + standard deviation]. In this case, we have [74 - 8.9; 74 + 8.9] = [65.1, 82.9]. This means that the scores of 24 students are between this range. But the score of the new student falls outside of this range, which suggests that it will increase the standard deviation of the scores.
+
+
+
+### Problem 4
+
+#### a)
+```{r Read in Gallup Data}
+# Education data
+GEd <- read_csv("GallupByEd.csv", show_col_types=FALSE)
+GEd$Education <- factor(GEd$Education, levels=c("<= HS Grad", "Some College", "College Grad"))
+GEd$Response <- factor(GEd$Response)
+levels(GEd$Response)
+(levels(GEd$Response) <- c("Env", "Econ", "Equal", "No Op"))
+
+# Party ID data
+GPI <- read_csv("GallupByPI.csv", show_col_types=FALSE)
+GPI$PartyID <- factor(GPI$PartyID)
+GPI$PartyID <- recode_factor(GPI$PartyID, R = "Rep", D = "Dem", I = "Ind")
+levels(GPI$PartyID)
+GPI$Response <- factor(GPI$Response)
+levels(GPI$Response)
+(levels(GPI$Response) <- c("Env", "Econ", "Equal", "No Op"))
+```
+
+#### b)
+``` {r Observations in each data set}
+(GEd.count <- GEd %>% count())
+(GPI.count <- GPI %>% count())
+```
+
+GallupByEd.csv has 1007 observations.
+
+GallupByPI.csv has 985 observations.
+
+
+#### c)
+``` {r Create contingency tables}
+GEd.table <- GEd %>% 
+  count(Education, Response) %>%
+    pivot_wider(names_from = Response, values_from = n)
+
+GPI.table <- GPI %>%
+  count(PartyID, Response) %>%
+    pivot_wider(names_from = Response, values_from = n)
+```
+
+
+#### d)
+``` {r Joint percentage}
+(pct.EconColl <- round((131/1007 * 100), 2))
+```
+
+The joint percentage of people who favor economic policy and have some college is 13.01%
+
+
+#### e)
+``` {r Margin percentage}
+(total.PartyID <- c(rowSums(GPI.table[,][2:5])))
+(mpct.PartyID <- total.PartyID/985 * 100)
+```
+
+The marginal percentages for the Rep party identification is 25.28%, Dem is 32.59%, and Ind is 42.13%.
+
+
+#### f)
+``` {r Row conditional percentages}
+GEd %>% 
+  count(Education, Response) %>%
+  group_by(Education) %>%
+  mutate(pctEd = n / sum(n) * 100) %>%
+  pivot_wider(id_cols = c(Education, Response, pctEd), names_from = Response, values_from = pctEd)
+
+GPI %>%
+  count(PartyID, Response) %>%
+  group_by(PartyID) %>%
+  mutate(pctPI = n / sum(n) * 100) %>%
+    pivot_wider(id_cols = c(PartyID, Response, pctPI), names_from = Response, values_from = pctPI)
+```
+
+The conditional percentages for Response for those participants who identify as democrats are:
+
+1. Env: 68.85%
+
+2. Econ: 24.92%
+
+3. Equal: 4.05%
+
+4. No Op: 2.18%
+
+
+#### g)
+``` {r GEd bar graphs}
+# Counts
+ggplot(GEd, aes(x = Education, fill = Response)) +
+  geom_bar(position = "dodge") +
+  labs (y = "Number of Response")
+
+#Proportions
+ggplot(GEd, aes(x = Education, fill = Response)) +
+  geom_bar(position = "fill") +
+  labs (y = "Proportion of Response")
+```
+
+The majority of all three levels of education prefer Environmental Policy over the the Economic Policy. A few of them choose Equal and No Option
+
+
+#### h)
+While there is not so much difference between Environmental and Economical preference in the groups of <= HS Grad and Some College students, the proportion of College Grad students who choose Environmental Policy significantly outweight the students who prefer Economical Policy.
+There are more proportion of students in the group of <= HS Grad choose No Option than those who belong to Some College and College Grad Groups.
+
+
+
+### Problem 5
+#### a)
+This study was an experiment because the participants were randomly assigned to 4 different diet groups and the main outcome measures were the adherence rates and the effectiveness of 4 popular diets (Atkins, Zone, Weight Watchers, and Ornish) for weight loss and cardiac risk factor reduction.
+
+
+#### b)
+Participants sampled for this study were overweight or obese (body mass index: mean, 35; range, 27-42) adults aged 22 to 72 years with known hypertension, dyslipidemia, or fasting hyperglycemia.
+
+
+#### c)
+Population of interest is overweight or obese adults aged 22 to 72 years with known hypertension, dyslipidemia, or fasting hyperglycemia.
+The results can only be generalized to the population of interest because these diets although may have the same effects in terms of weight loss but they might have different or no effects on the other population in terms of cardiac risk factor.
+
+
+#### d)
+```{r Read in Diet Data}
+PD <- read_csv("PopularDiets.csv", show_col_types=FALSE)
+PD$Diet <- factor(PD$Diet)
+PD$Completion <- factor(PD$Completion)
+(PD.C <- PD %>% filter(Completion == "completed"))
+```
+
+
+#### e)
+```{r Count Observation}
+(PD %>% count())
+(PDC.count <- PD.C %>% count())
+```
+
+There are a total of 160 observations in the data set, but only 93 of the subjects completed the study.
+
+#### f)
+```{r Statistic Summary & Graphs}
+# Statistic Summaries
+PD.C %>% summarise(n = 93,
+                   Mean = round(mean(IntWtKG), 1),
+                   Min = min(IntWtKG),
+                   SD = round(sd(IntWtKG), 1),
+                   Q1 = quantile(IntWtKG, 0.25),
+                   Median = median(IntWtKG),
+                   Q3 = quantile(IntWtKG, 0.75),
+                   Max = max(IntWtKG))
+
+# Histogram
+ggplot(PD.C, aes(x = IntWtKG)) +
+  geom_histogram(bins = 15) +
+  labs(x = "Initial Weight (KG)")
+
+# Box plot
+ggplot(PD.C, aes(x = IntWtKG)) +
+  geom_boxplot() +
+  labs(x = "Initial Weight (KG)")
+```
+
+The average of the Initial weight of 93 participants (those who completed the study) was 101.5 kg, with the standard deviation of 16.2 kg.
+The Initial wight ranged from 71.5 kg to 139.3 kg.
+The median of the Initial weight of 93 participants was 99 kg, which mean 50% of the data values were below 99kg and 50% above.
+Looking at the histogram and box plot, there is no apparent outliers.
+According to the histogram, the data distribution was right skewed.
+
+Numeric statics I think are best to use to summarize the distribution is the 7-number summary and the sample size because with the min-max, median and IQR, we have some sense of the location and spread of skewed distribution. Mean and SD will tell us how far away the data values are from the mean.  SD is small if the data values close to mean (less spread out) and SD is large if data values far from mean (more spread out).
+
+
+#### g)
+``` {r Comparative Box plots for Initial weight}
+p <- ggplot(PD.C, aes(x = Diet, y = IntWtKG)) + 
+  geom_boxplot() + xlab("Diet Type") +
+  ylab("Initial Weight (kg)")
+p + coord_flip()
+```
+
+Regarding the Initial Weight boxplots by diet type:
+
+  Atkins is slightly right-skewed, and has no apparent outlier.
+  
+  Ornish has the smallest IQR, largest median value among 4 diets, slightly right skewed, and no apparent outlier.
+  
+  WW is slightly right skewed with the least dispersion in data values and has no apparent outlier.
+  
+  Zone is right skewed, the data distribution is the most dispersed among 4 diets; the smallest and largest values of the whole data set, n = 93, are included in Zone; and it has no apparent outlier.
+  
+
+#### h)
+No, because what all we care about in the end is the change in weight of each participants, not the end weight so the distributions of initial weights across the four diets is not really important.
+
+
+...
